@@ -7,11 +7,12 @@ let
   python-with-my-packages = pkgs.callPackage ./python.nix {};
 in
 {
+  disabledModules = [ "virtualisation/parallels-guest.nix" ];
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
       ./alias.nix
-      # ./eaf.nix
+      ./parallels-guest.nix
     ];
 
   # Use the systemd-boot EFI boot loader.
@@ -74,17 +75,18 @@ in
   # $ nix search wget
    environment.systemPackages = with pkgs; [
      vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+     emacsGit
      wget
-     firefox
      git
      ripgrep
      fish
-     emacsGit
+     exa
      python-with-my-packages
      nodejs wmctrl aria xdotool
-     cmake
-     exa
+     cmake gnumake
+     firefox
      google-chrome
+     alacritty
    ];
 
    environment.variables = {
@@ -97,11 +99,15 @@ in
    services.emacs.package = pkgs.emacsUnstable;
    nixpkgs.overlays = [
      (import (builtins.fetchTarball {
-        url = https://github.com/nix-community/emacs-overlay/archive/master.tar.gz;
+        url = https://github.com/nix-community/emacs-overlay/archive/xxxxx.tar.gz; # 指定 hash
      }))
    ];
   # services.emacs.enbale = true;
 
+  hardware.parallels = {
+    enable = true;
+    package = (config.boot.kernelPackages.callPackage ./prl-tools.nix {});
+  };
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
